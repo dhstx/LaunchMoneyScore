@@ -175,13 +175,19 @@ export const appRouter = router({
         url: z.string().url(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // Rate limit by IP
+        // Rate limit by IP (10 audits per hour)
         const ip = ctx.req.ip || ctx.req.socket.remoteAddress || 'unknown';
-        checkRateLimit(`audit:${ip}`, 5, 60 * 60 * 1000); // 5 per hour
-
-        // Validate URL
+        checkRateLimit(ip, 10, 60 * 60 * 1000);
+        
+        // Normalize URL - add https:// if missing
+        let normalizedUrl = input.url.trim();
+        if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+          normalizedUrl = 'https://' + normalizedUrl;
+        }
+        
+        // Validate URL format
         try {
-          new URL(input.url);
+          new URL(normalizedUrl);
         } catch {
           throw new TRPCError({
             code: 'BAD_REQUEST',
@@ -211,7 +217,7 @@ export const appRouter = router({
         const auditId = randomBytes(16).toString('hex');
         const auditRun = await createAuditRun({
           id: auditId,
-          url: input.url,
+          url: normalizedUrl,
           userId: ctx.user?.id || null,
           status: 'pending',
           ipAddress,

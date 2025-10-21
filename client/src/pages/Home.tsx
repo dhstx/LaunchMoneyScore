@@ -49,7 +49,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-3 bg-white/10 backdrop-blur-sm p-4 rounded-lg">
                 <Input
                   type="url"
-                  placeholder="https://example.com"
+                  placeholder="example.com or https://example.com"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   className="flex-1 bg-white text-foreground border-0 h-12 text-lg"
