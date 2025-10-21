@@ -48,7 +48,7 @@ export default function Home() {
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
               <div className="flex flex-col sm:flex-row gap-3 bg-white/10 backdrop-blur-sm p-4 rounded-lg">
                 <Input
-                  type="url"
+                  type="text"
                   placeholder="example.com or https://example.com"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}

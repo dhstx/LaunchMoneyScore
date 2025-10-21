@@ -172,7 +172,7 @@ export const appRouter = router({
     // Start a new audit run
     start: publicProcedure
       .input(z.object({
-        url: z.string().url(),
+        url: z.string().min(1, 'URL is required'),
       }))
       .mutation(async ({ input, ctx }) => {
         // Rate limit by IP (10 audits per hour)
