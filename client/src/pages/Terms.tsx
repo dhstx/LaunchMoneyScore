@@ -100,7 +100,7 @@ export default function Terms() {
             <li>Refunds issued to original payment method within 5-10 business days</li>
             <li>Access to purchased reports will be revoked upon refund</li>
           </ul>
-          <p><strong>To request a refund:</strong> Email support@lms-auditor.com with your order number.</p>
+          <p><strong>To request a refund:</strong> Email support@launchmoneyscore.com with your order number.</p>
           <p>
             <strong>Note:</strong> Refunds are not available for reports downloaded more than 7 days ago,
             unless there was a technical error in the audit results.
@@ -201,7 +201,7 @@ export default function Terms() {
 
           <h2>16. Dispute Resolution</h2>
           <p>
-            For any disputes, you agree to first contact us at support@lms-auditor.com to attempt informal
+            For any disputes, you agree to first contact us at support@launchmoneyscore.com to attempt informal
             resolution. If unresolved within 30 days, disputes may be submitted to binding arbitration.
           </p>
 
@@ -214,8 +214,8 @@ export default function Terms() {
           <h2>18. Contact Information</h2>
           <p>For questions about these Terms, contact us at:</p>
           <ul>
-            <li>Email: support@lms-auditor.com</li>
-            <li>Website: lms-auditor.com/contact</li>
+            <li>Email: support@launchmoneyscore.com</li>
+            <li>Website: launchmoneyscore.com/contact</li>
           </ul>
 
           <div className="mt-12 p-6 bg-muted rounded-lg">

@@ -59,10 +59,10 @@ export default function Contact() {
               </CardHeader>
               <CardContent>
                 <a
-                  href="mailto:support@lms-auditor.com"
+                  href="mailto:support@launchmoneyscore.com"
                   className="text-primary hover:underline"
                 >
-                  support@lms-auditor.com
+                  support@launchmoneyscore.com
                 </a>
                 <p className="text-sm text-muted-foreground mt-2">
                   Response within 24 hours
@@ -80,10 +80,10 @@ export default function Contact() {
               </CardHeader>
               <CardContent>
                 <a
-                  href="mailto:sales@lms-auditor.com"
+                  href="mailto:sales@launchmoneyscore.com"
                   className="text-primary hover:underline"
                 >
-                  sales@lms-auditor.com
+                  sales@launchmoneyscore.com
                 </a>
                 <p className="text-sm text-muted-foreground mt-2">
                   Response within 12 hours
@@ -101,10 +101,10 @@ export default function Contact() {
               </CardHeader>
               <CardContent>
                 <a
-                  href="mailto:hello@lms-auditor.com"
+                  href="mailto:hello@launchmoneyscore.com"
                   className="text-primary hover:underline"
                 >
-                  hello@lms-auditor.com
+                  hello@launchmoneyscore.com
                 </a>
                 <p className="text-sm text-muted-foreground mt-2">
                   Response within 48 hours
@@ -204,7 +204,7 @@ export default function Contact() {
               <strong>Business Hours:</strong> Monday - Friday, 9 AM - 6 PM EST
             </p>
             <p className="mt-2">
-              For urgent technical issues, please email support@lms-auditor.com with "URGENT" in the subject line.
+              For urgent technical issues, please email support@launchmoneyscore.com with "URGENT" in the subject line.
             </p>
           </div>
         </div>

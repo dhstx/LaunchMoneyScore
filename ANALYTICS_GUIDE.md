@@ -150,29 +150,29 @@ Add UTM parameters to your marketing links:
 
 **Format:**
 ```
-https://lms-auditor.com/?utm_source=SOURCE&utm_medium=MEDIUM&utm_campaign=CAMPAIGN
+https://launchmoneyscore.com/?utm_source=SOURCE&utm_medium=MEDIUM&utm_campaign=CAMPAIGN
 ```
 
 **Examples:**
 
 **Reddit Launch:**
 ```
-https://lms-auditor.com/?utm_source=reddit&utm_medium=social&utm_campaign=launch
+https://launchmoneyscore.com/?utm_source=reddit&utm_medium=social&utm_campaign=launch
 ```
 
 **Product Hunt:**
 ```
-https://lms-auditor.com/?utm_source=producthunt&utm_medium=listing&utm_campaign=launch
+https://launchmoneyscore.com/?utm_source=producthunt&utm_medium=listing&utm_campaign=launch
 ```
 
 **Google Ads:**
 ```
-https://lms-auditor.com/?utm_source=google&utm_medium=cpc&utm_campaign=website-audit
+https://launchmoneyscore.com/?utm_source=google&utm_medium=cpc&utm_campaign=website-audit
 ```
 
 **Email Newsletter:**
 ```
-https://lms-auditor.com/?utm_source=newsletter&utm_medium=email&utm_campaign=week1
+https://launchmoneyscore.com/?utm_source=newsletter&utm_medium=email&utm_campaign=week1
 ```
 
 ### Tracking Campaign Performance
@@ -284,7 +284,7 @@ Currently, data can be exported by:
 For issues with analytics or the admin dashboard:
 - Check server logs: `pnpm logs`
 - Review database: Check `audit_runs` and `reports` tables
-- Contact: support@lms-auditor.com
+- Contact: support@launchmoneyscore.com
 
 ---
 

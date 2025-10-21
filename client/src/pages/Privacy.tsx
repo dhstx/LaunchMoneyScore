@@ -113,7 +113,7 @@ export default function Privacy() {
             <li>Export your data in a portable format</li>
             <li>Withdraw consent at any time</li>
           </ul>
-          <p>To exercise these rights, contact us at privacy@lms-auditor.com</p>
+          <p>To exercise these rights, contact us at privacy@launchmoneyscore.com</p>
 
           <h2>Cookies and Tracking</h2>
           <p>We use cookies and similar technologies to:</p>
@@ -145,8 +145,8 @@ export default function Privacy() {
           <h2>Contact Us</h2>
           <p>If you have questions about this privacy policy or our data practices, contact us at:</p>
           <ul>
-            <li>Email: privacy@lms-auditor.com</li>
-            <li>Website: lms-auditor.com/contact</li>
+            <li>Email: privacy@launchmoneyscore.com</li>
+            <li>Website: launchmoneyscore.com/contact</li>
           </ul>
 
           <div className="mt-12 p-6 bg-muted rounded-lg">
