@@ -46,6 +46,14 @@ export const auditRuns = mysqlTable("audit_runs", {
   // Timestamps
   createdAt: timestamp("createdAt").defaultNow(),
   completedAt: timestamp("completedAt"),
+  
+  // Analytics fields
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  referrer: text("referrer"),
+  utmSource: varchar("utmSource", { length: 100 }),
+  utmMedium: varchar("utmMedium", { length: 100 }),
+  utmCampaign: varchar("utmCampaign", { length: 100 }),
 });
 
 export type AuditRun = typeof auditRuns.$inferSelect;

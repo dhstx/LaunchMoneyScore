@@ -5,7 +5,9 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { runFullAudit } from "./services/orchestrator";
-import { createAuditRun, updateAuditRun, getAuditRun, getUserAuditRuns, createReport, getReport, updateReport } from "./db";
+import { createAuditRun, updateAuditRun, getAuditRun, getUserAuditRuns, createReport, getReport, updateReport, getDb } from "./db";
+import { auditRuns, reports } from "../drizzle/schema";
+import { eq, desc, inArray } from "drizzle-orm";
 import { checkRateLimit } from "./middleware/rate-limit";
 import { randomBytes } from "crypto";
 import { createCheckoutSession } from "./services/stripe-service";
@@ -13,6 +15,147 @@ import { analytics } from "./services/analytics";
 
 export const appRouter = router({
   system: systemRouter,
+
+  admin: router({
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+      }
+
+      const db = await getDb();
+      if (!db) return null;
+
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const allAudits = await db.select().from(auditRuns);
+      const allReports = await db.select().from(reports).where(eq(reports.isPaid, true));
+
+      const auditsToday = allAudits.filter(a => a.createdAt && a.createdAt >= todayStart).length;
+      const purchasesToday = allReports.filter(r => r.paidAt && r.paidAt >= todayStart).length;
+
+      const totalRevenue = allReports.reduce((sum, r) => sum + (r.amountPaid || 0), 0);
+      const uniqueUsers = new Set(allAudits.map(a => a.userId || a.ipAddress).filter(Boolean)).size;
+      const registeredUsers = new Set(allAudits.map(a => a.userId).filter(Boolean)).size;
+
+      return {
+        totalAudits: allAudits.length,
+        totalPurchases: allReports.length,
+        totalRevenue,
+        auditsToday,
+        purchasesToday,
+        uniqueUsers,
+        registeredUsers,
+      };
+    }),
+
+    getRecentAudits: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+      }
+
+      const db = await getDb();
+      if (!db) return null;
+
+      // Get recent audits with purchase status
+      const audits = await db
+        .select()
+        .from(auditRuns)
+        .orderBy(desc(auditRuns.createdAt))
+        .limit(50);
+
+      const auditIds = audits.map(a => a.id);
+      const purchases = await db
+        .select()
+        .from(reports)
+        .where(inArray(reports.auditRunId, auditIds));
+
+      const purchaseMap = new Map(purchases.map(p => [p.auditRunId, p]));
+
+      const auditsWithPurchases = audits.map(audit => ({
+        ...audit,
+        hasPurchase: purchaseMap.has(audit.id),
+      }));
+
+      // Get recent purchases with audit details
+      const recentPurchases = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.isPaid, true))
+        .orderBy(desc(reports.paidAt))
+        .limit(50);
+
+      const purchaseAuditIds = recentPurchases.map(p => p.auditRunId);
+      const purchaseAudits = await db
+        .select()
+        .from(auditRuns)
+        .where(inArray(auditRuns.id, purchaseAuditIds));
+
+      const auditMap = new Map(purchaseAudits.map(a => [a.id, a]));
+
+      const purchasesWithDetails = recentPurchases.map(purchase => {
+        const audit = auditMap.get(purchase.auditRunId);
+        return {
+          ...purchase,
+          url: audit?.url,
+          lms: audit?.lms,
+          userEmail: audit?.userId ? 'User' : null,
+        };
+      });
+
+      // Calculate traffic sources
+      const sourceStats = new Map<string, { audits: number; purchases: number; revenue: number }>();
+      
+      audits.forEach(audit => {
+        const source = audit.utmSource || audit.referrer || 'Direct';
+        const stats = sourceStats.get(source) || { audits: 0, purchases: 0, revenue: 0 };
+        stats.audits++;
+        
+        const purchase = purchaseMap.get(audit.id);
+        if (purchase?.isPaid) {
+          stats.purchases++;
+          stats.revenue += purchase.amountPaid || 0;
+        }
+        
+        sourceStats.set(source, stats);
+      });
+
+      const sources = Array.from(sourceStats.entries()).map(([source, stats]) => ({
+        source,
+        ...stats,
+      }));
+
+      return {
+        audits: auditsWithPurchases,
+        purchases: purchasesWithDetails,
+        sources,
+      };
+    }),
+
+    getConversionFunnel: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+      }
+
+      const db = await getDb();
+      if (!db) return null;
+
+      const allAudits = await db.select().from(auditRuns);
+      const allReports = await db.select().from(reports);
+
+      const auditsStarted = allAudits.length;
+      const auditsCompleted = allAudits.filter(a => a.status === 'completed').length;
+      const checkoutInitiated = allReports.length;
+      const purchasesCompleted = allReports.filter(r => r.isPaid).length;
+
+      return {
+        auditsStarted,
+        auditsCompleted,
+        checkoutInitiated,
+        purchasesCompleted,
+      };
+    }),
+  }),
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -46,6 +189,24 @@ export const appRouter = router({
           });
         }
 
+        // Extract analytics data
+        const ipAddress = ctx.req.ip || ctx.req.socket.remoteAddress || null;
+        const userAgent = ctx.req.get('user-agent') || null;
+        const referrer = ctx.req.get('referer') || null;
+        
+        // Extract UTM parameters from referrer if present
+        let utmSource = null;
+        let utmMedium = null;
+        let utmCampaign = null;
+        if (referrer) {
+          try {
+            const refUrl = new URL(referrer);
+            utmSource = refUrl.searchParams.get('utm_source');
+            utmMedium = refUrl.searchParams.get('utm_medium');
+            utmCampaign = refUrl.searchParams.get('utm_campaign');
+          } catch {}
+        }
+
         // Create audit run record
         const auditId = randomBytes(16).toString('hex');
         const auditRun = await createAuditRun({
@@ -53,6 +214,12 @@ export const appRouter = router({
           url: input.url,
           userId: ctx.user?.id || null,
           status: 'pending',
+          ipAddress,
+          userAgent,
+          referrer,
+          utmSource,
+          utmMedium,
+          utmCampaign,
         });
 
         // Start audit in background

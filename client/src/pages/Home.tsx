@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/_core/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,7 @@ import { useLocation } from 'wouter';
 export default function Home() {
   const [url, setUrl] = useState('');
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
   
   const startAudit = trpc.audit.start.useMutation({
     onSuccess: (data) => {
@@ -224,6 +226,9 @@ export default function Home() {
               <button onClick={() => setLocation('/privacy')} className="hover:text-foreground transition-colors">Privacy</button>
               <button onClick={() => setLocation('/terms')} className="hover:text-foreground transition-colors">Terms</button>
               <button onClick={() => setLocation('/contact')} className="hover:text-foreground transition-colors">Contact</button>
+              {user?.role === 'admin' && (
+                <button onClick={() => setLocation('/admin')} className="hover:text-foreground transition-colors font-medium">Admin</button>
+              )}
             </div>
           </div>
         </div>

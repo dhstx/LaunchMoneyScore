@@ -15,6 +15,13 @@
       "when": 1761062500313,
       "tag": "0001_dusty_freak",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1761067848540,
+      "tag": "0002_typical_preak",
+      "breakpoints": true
     }
   ]
 }
