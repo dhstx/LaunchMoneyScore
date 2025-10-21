@@ -81,7 +81,7 @@ export default function Home() {
             </form>
 
             <p className="mt-4 text-white/70 text-sm">
-              Free preview • Detailed report $29 • No credit card required
+              Free preview • Detailed report $29 • Use code <span className="font-mono font-bold">LAUNCH10</span> for 10% off
             </p>
           </motion.div>
         </div>
@@ -220,9 +220,10 @@ export default function Home() {
               © 2025 LMS Auditor. Powered by PageSpeed Insights, CrUX, and Playwright.
             </p>
             <div className="flex gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+              <button onClick={() => setLocation('/pricing')} className="hover:text-foreground transition-colors">Pricing</button>
+              <button onClick={() => setLocation('/privacy')} className="hover:text-foreground transition-colors">Privacy</button>
+              <button onClick={() => setLocation('/terms')} className="hover:text-foreground transition-colors">Terms</button>
+              <button onClick={() => setLocation('/contact')} className="hover:text-foreground transition-colors">Contact</button>
             </div>
           </div>
         </div>

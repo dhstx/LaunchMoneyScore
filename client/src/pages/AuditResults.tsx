@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, AlertCircle, CheckCircle2, XCircle, Download, Share2, ArrowLeft } from 'lucide-react';
+import { EmailCaptureDialog } from '@/components/EmailCaptureDialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function AuditResults() {
@@ -29,9 +30,18 @@ export default function AuditResults() {
     }
   );
 
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+  const [capturedEmail, setCapturedEmail] = useState('');
   const createReport = trpc.report.create.useMutation();
 
-  const handlePurchase = () => {
+  const handlePurchaseClick = () => {
+    // Show email capture dialog first
+    setEmailDialogOpen(true);
+  };
+
+  const handleEmailSubmit = (email: string) => {
+    setCapturedEmail(email);
+    // Proceed with report creation
     createReport.mutate(
       { auditId },
       {
@@ -119,7 +129,13 @@ export default function AuditResults() {
   const allGatesPassed = gates && Object.values(gates).every(Boolean);
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <EmailCaptureDialog
+        open={emailDialogOpen}
+        onClose={() => setEmailDialogOpen(false)}
+        onSubmit={handleEmailSubmit}
+      />
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b bg-card">
         <div className="container py-6">
@@ -144,7 +160,7 @@ export default function AuditResults() {
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>
-              <Button size="sm" onClick={handlePurchase} disabled={createReport.isPending}>
+              <Button size="sm" onClick={handlePurchaseClick} disabled={createReport.isPending}>
                 <Download className="mr-2 h-4 w-4" />
                 {createReport.isPending ? 'Processing...' : 'Get Full Report ($29)'}
               </Button>
@@ -312,7 +328,7 @@ export default function AuditResults() {
               <div className="text-4xl font-bold">$29</div>
               <Button
                 size="lg"
-                onClick={handlePurchase}
+                onClick={handlePurchaseClick}
                 disabled={createReport.isPending}
                 className="bg-white text-primary hover:bg-white/90 h-12 px-8"
               >
@@ -327,6 +343,7 @@ export default function AuditResults() {
         </div>
       </section>
     </div>
+    </>
   );
 }
 
