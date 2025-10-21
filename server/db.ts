@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, auditRuns, InsertAuditRun, AuditRun, reports, InsertReport, Report, apiKeys, ApiKey, InsertApiKey } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -85,4 +85,100 @@ export async function getUser(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Audit Run helpers
+export async function createAuditRun(data: InsertAuditRun): Promise<AuditRun> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(auditRuns).values(data);
+  const result = await db.select().from(auditRuns).where(eq(auditRuns.id, data.id!)).limit(1);
+  return result[0];
+}
+
+export async function updateAuditRun(id: string, data: Partial<InsertAuditRun>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(auditRuns).set(data).where(eq(auditRuns.id, id));
+}
+
+export async function getAuditRun(id: string): Promise<AuditRun | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(auditRuns).where(eq(auditRuns.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getUserAuditRuns(userId: string): Promise<AuditRun[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(auditRuns).where(eq(auditRuns.userId, userId));
+}
+
+// Report helpers
+export async function createReport(data: InsertReport): Promise<Report> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(reports).values(data);
+  const result = await db.select().from(reports).where(eq(reports.id, data.id!)).limit(1);
+  return result[0];
+}
+
+export async function updateReport(id: string, data: Partial<InsertReport>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(reports).set(data).where(eq(reports.id, id));
+}
+
+export async function getReport(id: string): Promise<Report | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(reports).where(eq(reports.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getReportByPaymentIntent(paymentIntentId: string): Promise<Report | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(reports).where(eq(reports.stripePaymentIntentId, paymentIntentId)).limit(1);
+  return result[0];
+}
+
+// API Key helpers
+export async function createApiKey(data: InsertApiKey): Promise<ApiKey> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(apiKeys).values(data);
+  const result = await db.select().from(apiKeys).where(eq(apiKeys.id, data.id!)).limit(1);
+  return result[0];
+}
+
+export async function getApiKey(key: string): Promise<ApiKey | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(apiKeys).where(eq(apiKeys.key, key)).limit(1);
+  return result[0];
+}
+
+export async function updateApiKey(id: string, data: Partial<InsertApiKey>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(apiKeys).set(data).where(eq(apiKeys.id, id));
+}
+
+export async function getUserApiKeys(userId: string): Promise<ApiKey[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(apiKeys).where(eq(apiKeys.userId, userId));
+}
+

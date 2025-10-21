@@ -170,3 +170,21 @@
     }
   }
 }
+
+/* Custom gradient backgrounds for LMS Auditor */
+.gradient-primary {
+  background: linear-gradient(135deg, oklch(0.45 0.22 264) 0%, oklch(0.55 0.22 280) 100%);
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, oklch(0.65 0.18 160) 0%, oklch(0.75 0.18 140) 100%);
+}
+
+.gradient-warning {
+  background: linear-gradient(135deg, oklch(0.75 0.18 80) 0%, oklch(0.65 0.22 50) 100%);
+}
+
+.gradient-danger {
+  background: linear-gradient(135deg, oklch(0.577 0.245 27) 0%, oklch(0.477 0.245 15) 100%);
+}
+
