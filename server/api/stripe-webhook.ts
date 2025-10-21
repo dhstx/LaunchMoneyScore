@@ -62,7 +62,7 @@ export async function handleStripeWebhook(req: Request, res: Response) {
       // Generate badge code if LMS >= 85
       let badgeCode = null;
       if (result.lms >= SCORING_SPEC.thresholds.lms_badge_threshold) {
-        badgeCode = generateBadgeCode(audit.url, result.lms);
+        badgeCode = generateBadgeCode(result.lms, audit.url);
       }
 
       // Update report with files
