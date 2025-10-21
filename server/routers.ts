@@ -9,6 +9,7 @@ import { createAuditRun, updateAuditRun, getAuditRun, getUserAuditRuns, createRe
 import { checkRateLimit } from "./middleware/rate-limit";
 import { randomBytes } from "crypto";
 import { createCheckoutSession } from "./services/stripe-service";
+import { analytics } from "./services/analytics";
 
 export const appRouter = router({
   system: systemRouter,
@@ -71,16 +72,23 @@ export const appRouter = router({
               cruxApiKey,
             });
 
+            const lms = Math.round(result.lms);
+            const rri = Math.round(result.rri);
+            const pmi = Math.round(result.pmi);
+
             await updateAuditRun(auditId, {
               status: 'completed',
-              lms: Math.round(result.lms),
-              rri: Math.round(result.rri),
-              pmi: Math.round(result.pmi),
+              lms,
+              rri,
+              pmi,
               categories: result.categories as any,
               gates: result.gates as any,
               topFixes: result.topFixes as any,
               completedAt: new Date(),
             });
+
+            // Track analytics
+            analytics.scoreDone(input.url, lms, rri, pmi).catch(console.error);
           } catch (error: any) {
             console.error('[Audit] Error running audit:', error);
             await updateAuditRun(auditId, {
@@ -89,6 +97,9 @@ export const appRouter = router({
             });
           }
         })();
+
+        // Track analytics
+        analytics.scoreStart(input.url).catch(console.error);
 
         return {
           auditId,
